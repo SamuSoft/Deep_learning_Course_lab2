@@ -1,4 +1,4 @@
-function Assignment1()
+function Assignment2()
 
     [train_X,train_Y,train_y]                   = LoadBatch('data_batch_1.mat');
     [validation_X,validation_Y,validation_y]    = LoadBatch('data_batch_2.mat');
@@ -8,10 +8,10 @@ function Assignment1()
     % Different settings for different runs
     % ------------------------------------------------
     run_variable_index = 1;
-
+    standard_deviation = .001;
     lambda_l        = [ 0, 0, .1, 1 ];
     n_batch_l       = [ 100,  100,  100,  100 ];
-    eta_l           = [ .1, .01,  .01,. 01  ];
+    eta_l           = [ .1, .01,  .01,  .01  ];
     n_epochs_l      = [ 40, 40, 40, 40  ];
 
     lambda = lambda_l(run_variable_index);
@@ -23,6 +23,12 @@ function Assignment1()
      Xtrain = train_X;
      Ytrain = train_Y;
 
+    %  Preprocessing data
+    % ------------------------------------------------
+     mean_X = mean(Xtrain,2);
+     Xtrain = double(Xtrain) - repmat(mean_X, [1, size(Xtrain, 2)]);
+    % ------------------------------------------------
+
      acc = zeros(8,40);
      cost = acc;
 
@@ -30,19 +36,24 @@ function Assignment1()
 
      GDparams = [n_batch, eta, n_epochs];
 
-    %  Layer 1
-     W_1 = 0.1.*randn(hidden_layer_nodes_1, size(train_X,1));
-     b_1 = 0.1.*randn(hidden_layer_nodes_1,1);
+     [W_layers, b_layers] = init_param(standard_deviation, hidden_layer_nodes_1, size(train_X,1), size(train_Y,1));
 
-    %  Layer 2
-     W_2 = 0.1.*randn(size(train_Y,1),hidden_layer_nodes_1);
-     b_2 = 0.1.*randn(size(train_Y,1),1);
+     P = EvaluateClassifier(Xtrain(:,1), W_layers, b_layers);
+    %  for i = 1:size(Y,2)
+     %
+    %  end
+
+
+     [grad_W, grad_b] = ComputeGradients(Xtrain(:,1), Ytrain(:,1), P, W_layers, b_layers, lambda);
+    %  [grad_W_1, grad_b_1] = ComputeGradients(Xtrain, Ytrain, P{1}, W_layers{1}, b_layers{1}, lambda);
 
     %  Packaging the layers
-     W_layers = [W_1,W_2];
-     b_layers = [b_1,b_2];
+    %  W_layers = {W_1,W_2};
+    %  b_layers = {b_1,b_2};
 
-     
+    %  EvaluateClassifier(Xtrain(:,1), W_layers, b_layers);
+    %  ComputeCost(Xtrain, Ytrain, W_layers, b_layers, lambda);
+
 
      %
     %  for i = 1:n_epochs
