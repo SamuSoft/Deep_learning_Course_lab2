@@ -11,7 +11,7 @@ function [grad_W, grad_b] = ComputeGradients(X, Y, P, W, b, lambda)
         grad_W{2} = grad_W{2} + (G(:,i)*P{2}(:,i)');
         g = G(:,i)'*W{2};
         g = g*diag((P{1}(:,i)>0));
-        grad_b{1} = grad_b{1} + g;
+        grad_b{1} = grad_b{1} + g';
         grad_W{1} = grad_W{1} + g'*X(:,i)';
 
     end
