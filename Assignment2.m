@@ -1,4 +1,4 @@
-function [acc, loss] = Assignment2()
+function [Values] = Assignment2()
 
   [train_X,train_Y,train_y]                   = LoadBatch('data_batch_1.mat');
 %   [validation_X,validation_Y,validation_y]    = LoadBatch('data_batch_2.mat');
@@ -10,21 +10,29 @@ function [acc, loss] = Assignment2()
 %   run_variable_index is different for different labs;
   run_variable_index = 5;
   standard_deviation = .001;
-  lambda_l        = [ 0,    0,      .1,     1,      0 ];
+  lambda_l        = [ .000001,    .000001,      .000001,     .000001,      .000001 ];
   n_batch_l       = [ 100,  100,    100,    100,    100 ];
-  eta_l           = [ .1,   .01,    .01,    .01,    .1  ];
-  n_epochs_l      = [ 40,   40,     40,     40,     200  ];
-  rho = {.5,.9,.99};
+  eta_l           = [ .1,   .01,    .01,    .01,    .01  ];
+  n_epochs_l      = [ 5,   5,     5,     5,     40  ];
+  rho_l = {.5,.9,.99,.5,.9,.99};
+  rho = .9;%rho(run_variable_index);
   decay_rate = .95;
+  % lambda_l        = [ ,    ,      ,     ,       ];
+  % n_batch_l       = [ ,    ,      ,     ,       ];
+  % eta_l           = [ ,    ,      ,     ,       ];
+  % n_epochs_l      = [ ,    ,      ,     ,       ];
 
   lambda = lambda_l(run_variable_index);
   n_batch= n_batch_l(run_variable_index);
   eta = eta_l(run_variable_index);
   n_epochs = n_epochs_l(run_variable_index);
+  hidden_layer_nodes_1 = 50;
+  GDparams = {n_batch, eta, n_epochs, rho, standard_deviation, lambda, hidden_layer_nodes_1};
   % ------------------------------------------------
 
   Xtrain = double(train_X(:,1:100));
   Ytrain = double(train_Y(:,1:100));
+  ytrain = double(train_y(1:100,:));
   Xtest = double(test_X);
 
   %  Preprocessing data
@@ -34,43 +42,40 @@ function [acc, loss] = Assignment2()
   Xtest = double(test_X) - repmat(mean_X, [1, size(test_X, 2)]);
   % ------------------------------------------------
 
-  hidden_layer_nodes_1 = 50;
+  Train_Data = {Xtrain, Ytrain, ytrain};
+  Test_Data = {Xtest,test_Y,test_y};
 
-  GDparams = {n_batch, eta, n_epochs};
+  loops = 1;
+  e_min = -2;
+  e_max = .99;
+  l_min = -2;
+  l_max = .99;
+  % loss_list = zeros(1,loops);
+  eta_list = zeros(1,loops);
+  lambda_list = zeros(1,loops);
 
-  disp('Initializing parameters')
-  [W_layers, b_layers] = init_param(standard_deviation, hidden_layer_nodes_1, size(train_X,1), size(train_Y,1));
 
-  %  Init momentum to training
 
-  acc = zeros(2,n_epochs);
-  loss = zeros(2,n_epochs);
-  disp('Starting Mini Batch Gradient Decent')
-  fprintf('Epoch = 0');
-  
-  for i = 1:n_epochs
-    [new_W_layers, new_b_layers] = MiniBatchGD(Xtrain, Ytrain, GDparams, W_layers, b_layers, lambda);
-    W_layers = new_W_layers;
-    b_layers = new_b_layers;
+  for i = 1:loops
+      % random eta
+      e = e_min + (e_max-e_min)*rand();
+      eta = 10^e;
+      l = l_min + (l_max-l_min)*rand();
+      lambda = 10^l;
 
-    %   Prints out which epoch you are in
-    % ------------------------------------------------
-    if i < 11
-      fprintf(' \b\b%d', i);
-    elseif i < 101
-      fprintf(' \b\b\b%d', i);
-    else
-      fprintf(' \b\b\b\b%d', i);
-    end
-    % ------------------------------------------------
+      eta = .01;
+      lambda = .000001;
+      rho = .9;
+      n_epochs = 40;
+      hidden_layer_nodes_1 = 50;
 
-    loss(1,i) = ComputeCost(Xtrain, Ytrain, W_layers, b_layers, lambda);
-    loss(2,i) = ComputeCost(Xtest, test_Y, W_layers, b_layers, lambda);
-    acc(1,i) = ComputeAccuracy(Xtrain, train_y, W_layers, b_layers, 'RMSE');
-    acc(2,i) = ComputeAccuracy(Xtest, test_y, W_layers, b_layers, 'RMSE');
+      GDparams = {n_batch, eta, n_epochs, rho, standard_deviation, lambda, hidden_layer_nodes_1};
+      [Data, Model] = RunNetwork(Train_Data, Test_Data, GDparams);
+      loss_list = Data{2}(2,:);
+      lambda_list(1,i) = lambda;
+      eta_list(1,i) = eta;
+      disp('Loop: ');
+      disp(i);
   end
-
-  fprintf('\n');
-
-
+  Values = {loss_list, lambda_list, eta_list, Model};
 end

@@ -5,6 +5,7 @@ function [grad_W, grad_b] = ComputeGradients(X, Y, P, W, b, lambda)
     grad_W{2} = 0;
     grad_b{1} = 0;
     grad_b{2} = 0;
+   
 
     for i = 1:size(Y,2)
         grad_b{2} = grad_b{2} + G(:,i);
