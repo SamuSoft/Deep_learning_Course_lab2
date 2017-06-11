@@ -1,0 +1,37 @@
+# Assignment 2
+
+
+### Samuel Philipson
+
+## I
+
+I checked my analytical gradient against the numerical slow function, and since the error was in the 10^-7 range I believe it was bug free.
+
+## II
+
+Using the momentum made my training converge about 1/5 times faster.
+![Without momentum](no_momentum.jpg)
+![With momentum](best_plot.jpg)
+
+## III, IV
+
+I did a course grid search with 5 epochs for variables eta 0:10 and lambda 0:10. This showed that the variables most suited was in the eta 0:2 and lambda 0:6 range. I then did a finer random search with e_max = log(2) and l_max = log(6) with 10 epochs to find the next good values.
+
+The best performing networks had:
+#### 1:
+Lambda:  3.2764e-06
+ETA: 4.1980e-04
+
+#### 2:
+Lambda :8.0687e-06
+ETA: 6.1625e-09
+
+#### 3:
+Lambda : 0.1961
+ETA : 7.5070e-09
+
+## V
+
+Refer to plots in II
+
+With momentum the loss was reduced faster over time.

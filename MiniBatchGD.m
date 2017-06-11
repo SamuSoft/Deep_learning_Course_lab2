@@ -27,7 +27,7 @@ function [new_layers] = MiniBatchGD(X, Y, GDparams, layers, lambda)
         Ytrain = Y(:,((j-1)*n_batch + 1):(j*n_batch));
         P = EvaluateClassifier(Xtrain, W_layers, b_layers);
         [grad_W, grad_b] = ComputeGradients(Xtrain, Ytrain, P, W_layers, b_layers, lambda);
-
+        [grad_b{2}, grad_W{2}] = ComputeGradsNum(Xtrain, Ytrain, W_layers{2}, b_layers{2}, lambda);
     %     Update Layer 2
     % ------------------------------------------------
         % Update momentum vectors
